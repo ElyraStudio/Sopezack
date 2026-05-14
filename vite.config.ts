@@ -12,10 +12,4 @@ export default defineConfig({
   tanstackStart: {
     server: { entry: "server" },
   },
-  vite: {
-    base: "/",
-    build: {
-      outDir: ".vercel/output/static", // Avisa o compilador a cuspir o output onde o Vercel entende
-    }
-  }
 });
