@@ -8,9 +8,10 @@ export default defineConfig({
   plugins: [
     TanStackRouterVite(),
     react(),
+    tailwindcss(), // <--- Faltava essa linha aqui para o CSS funcionar!
     tsconfigPaths()
   ],
   build: {
-    outDir: "dist", // Garante que a saída vai para a pasta dist
+    outDir: "dist",
   }
 });
