@@ -1,4 +1,6 @@
 import { useEffect, useState } from "react";
+import { Link } from "@tanstack/react-router";
+import { supabase } from "@/lib/supabaseClient";
 
 const links = [
   { href: "#galeria", label: "Galeria" },
@@ -10,6 +12,20 @@ const links = [
 export function SiteNav() {
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
+  const [session, setSession] = useState<any>(null);
+
+  // Monitora o estado de autenticação para alterar o botão entre Login / Painel
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data: { session: currentSession } }) => {
+      setSession(currentSession);
+    });
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, currentSession) => {
+      setSession(currentSession);
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 24);
@@ -63,15 +79,24 @@ export function SiteNav() {
             ))}
           </div>
 
-          {/* Botão de Agendamento Desktop */}
-          <a
-            href="#contato"
-            className="hidden md:inline-block text-[10px] uppercase tracking-[0.3em] text-[#C5A059] border-b border-[#C5A059]/30 pb-1 hover:border-[#C5A059] transition-colors"
-          >
-            Agendar
-          </a>
+          {/* Botões do Lado Direito Desktop */}
+          <div className="hidden md:flex items-center gap-6">
+            <a
+              href="#contato"
+              className="text-[10px] uppercase tracking-[0.3em] text-[#C5A059] border-b border-[#C5A059]/30 pb-1 hover:border-[#C5A059] transition-colors"
+            >
+              Agendar
+            </a>
+            
+            <Link
+              to="/admin"
+              className="text-[10px] uppercase tracking-[0.3em] text-white/40 border border-white/10 rounded px-3 py-1.5 hover:text-white hover:border-white/30 transition-colors bg-zinc-900/20"
+            >
+              {session ? "Painel" : "Login"}
+            </Link>
+          </div>
 
-          {/* Botão de Menu Mobile Inteligente (Mantido!) */}
+          {/* Botão de Menu Mobile Inteligente */}
           <button
             onClick={() => setOpen((v) => !v)}
             className="md:hidden text-white/80 text-[10px] uppercase tracking-[0.3em] bg-transparent border-none outline-none cursor-pointer py-1 transition-colors hover:text-white"
@@ -96,6 +121,18 @@ export function SiteNav() {
                   <span className="text-[#C5A059] opacity-0 group-hover:opacity-100 transition-opacity">→</span>
                 </a>
               ))}
+              
+              {/* Linha Divisória para o Login no Mobile */}
+              <div className="h-[1px] bg-white/5 my-1" />
+              
+              <Link
+                to="/admin"
+                onClick={() => setOpen(false)}
+                className="text-white/50 hover:text-white transition-colors py-1 flex items-center justify-between group"
+              >
+                {session ? "Acessar Painel" : "Área Restrita (Login)"}
+                <span className="text-white/80 opacity-0 group-hover:opacity-100 transition-opacity">→</span>
+              </Link>
             </div>
           </div>
         )}
